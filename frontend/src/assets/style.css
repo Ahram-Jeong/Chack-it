@@ -8,3 +8,26 @@
     font-size: 30px;
     font-weight: bold;
 }
+
+/* button */
+.btn {
+    position: relative;
+    border: none;
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.btn-basic {
+    background-color: #000;
+    color: #e1eef6;
+}
+
+.btn:hover {
+    background-color: #fff;
+    color: #000;
+}

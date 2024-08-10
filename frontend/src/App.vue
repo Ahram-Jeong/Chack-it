@@ -6,7 +6,8 @@
 
     <v-main>
       <!-- contents -->
-      <LoginForm/>
+      <AccountForm v-if="!isLoggedIn" @login-success="loginState()" />
+      <BookReviews v-if="isLoggedIn" />
     </v-main>
     <v-footer app>
       <span>&copy; 2024 Chackit from Jeong-Ahram</span>
@@ -15,15 +16,23 @@
 </template>
 
 <script>
-import LoginForm from "@/components/LoginForm.vue";
+import AccountForm from "@/components/AccountForm.vue";
+import BookReviews from "@/components/BookReviews.vue";
 
 export default {
   components : {
-    LoginForm,
+    AccountForm,
+    BookReviews,
   },
 
   data: () => ({
-
+    isLoggedIn: false, // 최초 로그인 상태
   }),
+
+  methods: {
+    loginState() {
+      this.isLoggedIn = true; // 로그인 성공 시
+    },
+  },
 }
 </script>

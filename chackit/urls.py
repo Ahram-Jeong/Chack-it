@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.IndexView.as_view(), name = 'index'),
     # URL 추가
-    path('users/', include('users.urls')),
+    path('api/', include('api.urls')),
 ]
