@@ -1,24 +1,26 @@
 <template>
   <v-app id="inspire">
-    <v-app-bar app clipped-left>
-      <v-app-bar-title>📖 Chack-it!</v-app-bar-title>
+    <v-app-bar app clipped-left class = "custom-app-bar">
+      <v-app-bar-title class = "custom-app-bar-title">📖 Chackit</v-app-bar-title>
     </v-app-bar>
 
     <v-main>
-      <!--  -->
-      <HelloWorld/>
+      <!-- contents -->
+      <LoginForm/>
     </v-main>
     <v-footer app>
-      <span>&copy; 2024 Jeong-ahram</span>
+      <span>&copy; 2024 Chackit from Jeong-Ahram</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld.vue";
+import LoginForm from "@/components/LoginForm.vue";
 
 export default {
-  components : { HelloWorld },
+  components : {
+    LoginForm,
+  },
 
   data: () => ({
 
