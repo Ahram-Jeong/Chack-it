@@ -1,8 +1,11 @@
-from django.contrib.auth import login, get_user
+from django.contrib.auth import login, get_user, get_user_model
 from django.contrib.auth.views import LoginView
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
+from django.views.generic.edit import BaseCreateView
+
+from users.forms import CustomUserCreationForm
 
 
 # Create your views here.
@@ -35,3 +38,24 @@ class ApiMeView(View):
                 "username" : None
             }
         return JsonResponse(data = userDict, safe = True, status = 200)
+
+# 회원가입
+class ApiRegisterView(BaseCreateView):
+    form_class = CustomUserCreationForm
+
+    def form_valid(self, form):
+        self.object = form.save()
+        userDict = {
+            "id" : self.object.id,
+            "username" : self.object.username,
+            "email" : self.object.email,
+        }
+        return JsonResponse(data = userDict, safe = True, status = 201)
+
+    def form_invalid(self, form):
+        # 오류 정보 담기
+        errors = {
+            field : error.get_json_data() for (field, error) in form.errors.items()
+
+        }
+        return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)

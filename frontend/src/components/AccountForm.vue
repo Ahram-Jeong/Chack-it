@@ -56,7 +56,7 @@
   <v-dialog v-model="dialog" max-width="500">
     <v-card class="text-center pa-4">
       <h1 class="display-1 my-5" align="center">Join Us</h1>
-      <v-form @submit.prevent="onSubmit">
+      <v-form @submit.prevent="onSubmit" id="register-form" ref="registerForm">
         <v-text-field
             name="username"
             :readonly="loading"
@@ -65,6 +65,7 @@
             label="아이디"
             placeholder="Enter your id"
             clearable
+            :error-messages="errors.username"
         ></v-text-field>
 
         <v-text-field
@@ -75,6 +76,7 @@
             placeholder="Enter your password"
             type="password"
             clearable
+            :error-messages="errors.password1"
         ></v-text-field>
         <v-text-field
             name="password2"
@@ -84,6 +86,7 @@
             placeholder="Enter your password"
             type="password"
             clearable
+            :error-messages="errors.password2"
         ></v-text-field>
 
         <v-text-field
@@ -94,6 +97,7 @@
             placeholder="Enter your email"
             type="email"
             clearable
+            :error-messages="errors.email"
         ></v-text-field>
 
         <br />
@@ -105,7 +109,7 @@
             type="submit"
             variant="elevated"
             block
-            @click="join()"
+            @click="register()"
         >
           회원가입
         </v-btn>
@@ -136,6 +140,7 @@ export default {
     loading: false,
     dialog: false,
     me: {}, // 응답 user 정보
+    errors: {}, // 회원가입 각 필드의 오류 메시지 저장
   }),
 
   methods: {
@@ -149,23 +154,49 @@ export default {
     required(v) {
       return !!v || 'Field is required'
     },
+
     // 로그인
     login() {
       console.log("login() 호출");
       const postData = new FormData(document.getElementById("login-form"));
+
       axios.post("/api/login/", postData)
           .then(res => {
-            console.log("성공", res);
+            console.log("login() 성공", res);
             this.me = res.data; // Django에서 보내준 user 정보
+            window.location.href = "/"; // 홈으로 리다이렉트
           })
           .catch(err => {
-            console.log("실패", err);
+            console.log("login() 실패", err);
             alert("아이디, 비밀번호를 확인하세요.");
           });
     },
-    // 회원가입
-    join() {
 
+    // 회원가입
+    register() {
+      console.log("register() 호출");
+      this.errors = {}; // 오류 메시지 초기화
+      const postData = new FormData(document.getElementById("register-form"));
+
+      axios.post("/api/account/create/", postData, {headers : {"X-CSRFToken": this.csrfToken}})
+          .then(res => {
+            console.log("register() 성공", res);
+            console.log("username >> ", res.data.username);
+            this.dialog = false; // dialog 창 닫기
+          })
+          .catch(err => {
+            console.log("register() 실패", err);
+            if (err.response && err.response.data.errors) {
+              const errorData = err.response.data.errors;
+              // 서버에서 받은 오류 메시지를 errors 필드에 할당
+              this.errors.username = errorData.username ? errorData.username.map(e => e.message) : [];
+              this.errors.password1 = errorData.password1 ? errorData.password1.map(e => e.message) : [];
+              this.errors.password2 = errorData.password2 ? errorData.password2.map(e => e.message) : [];
+              this.errors.email = errorData.email ? errorData.email.map(e => e.message) : [];
+            } else {
+              alert("회원가입 실패:(");
+            }
+          });
     },
   },
 }
