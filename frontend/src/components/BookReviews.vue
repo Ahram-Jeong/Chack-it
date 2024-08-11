@@ -24,24 +24,27 @@
     <v-card>
       <v-toolbar color="white" flat>
         <v-toolbar-title>도서 검색</v-toolbar-title>
-        <v-btn icon="mdi-magnify" @click="bookSearch()"> </v-btn>
+        <v-btn icon="mdi-magnify" @click="searchBook()"> </v-btn>
       </v-toolbar>
 
       <v-card-title class="pb-0">
         <v-text-field
             ref="searchField"
-            v-model="search"
+            v-model="searchKeyword"
             label="도서명 입력"
             hide-details
             single-line
             class="white--text"
             style="background-color: white;"
+            @keyup.enter="searchBook()"
         ></v-text-field>
       </v-card-title>
 
+      <!-- 도서 검색 결과 -->
       <v-list>
-        <v-list-item v-for="item in items" :key="item.text">
-          <v-list-item-title v-text="item.text"></v-list-item-title>
+        <v-list-item v-for="book in books" :key="book.title" @click="detailBook()">
+          <v-list-item-title v-text="book.title" style="font-weight: bold;"></v-list-item-title>
+          <v-list-item-subtitle>{{ book.author }}, {{ book.publisher }}</v-list-item-subtitle>
         </v-list-item>
       </v-list>
 
@@ -49,13 +52,15 @@
 
       <v-card-actions class="pa-2" style="background-color: white;">
         <v-spacer></v-spacer>
-        <button class="text-grey text-decoration-none" @click="dialog1 = false">취소</button>
+        <button class="text-grey text-decoration-none" @click="cancelSearch()">취소</button>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data: () => ({
     reviews: [
@@ -74,20 +79,9 @@ export default {
       { title: "Title 13", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
       { title: "Title 14", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
     ],
-    cnt: 0,
     showCount: 5,
-    items: [
-      {
-        text: "WOODZ",
-      },
-      {
-        text: "테스트",
-      },
-      {
-        text: "Bonjour",
-      },
-    ],
-    search: "",
+    books: [],
+    searchKeyword: "",
     dialog1: false,
   }),
 
@@ -98,14 +92,40 @@ export default {
   },
 
   methods: {
+    // 더보기
     loadMore() {
       this.showCount += 5;
     },
 
-    // 도서 검색
-    bookSearch() {
-
+    // 검색 dialog 취소
+    cancelSearch() {
+      this.dialog1 = false;
+      this.searchKeyword = "";
+      this.books = [];
     },
+
+    // 도서 검색
+    searchBook() {
+      console.log("searchBook() 호출");
+      axios.get("/api/book/search/", {
+        params: {
+          keyword: this.searchKeyword,
+        }
+      }).then(res => {
+          console.log("searchBook() 성공", res);
+          this.books = res.data;
+          if(this.books == ""){
+            alert("검색 결과가 없습니다.");
+          }
+      }).catch(err => {
+          console.log("searchBook() 실패", err);
+      });
+    },
+
+    // 도서 상세 정보
+    detailBook() {
+
+    }
   }
 }
 </script>

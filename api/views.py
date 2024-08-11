@@ -1,12 +1,13 @@
 from django.contrib.auth import login, get_user, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
+from django.views.generic import ListView
 from django.views.generic.edit import BaseCreateView
 
+from book.models import Book
 from users.forms import CustomUserCreationForm
 
 
@@ -46,7 +47,7 @@ class ApiLogoutView(LogoutView):
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
         logout(request)
-        return JsonResponse(data = {}, safe=True, status=200)
+        return JsonResponse(data = {}, safe = True, status = 200)
 
 
 # 회원가입
@@ -68,3 +69,22 @@ class ApiRegisterView(BaseCreateView):
             field : error.get_json_data() for (field, error) in form.errors.items()
         }
         return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)
+
+# 도서 검색
+class ApiSearchListView(ListView):
+    model = Book
+
+    def get_queryset(self):
+        query = self.request.GET.get("keyword", "")
+        if query:
+            return Book.objects.filter(title__icontains = query)
+        return Book.objects.none()
+
+    def render_to_response(self, context, **response_kwargs):
+        books = self.get_queryset()
+        data = [{
+            "id": book.id,
+            "title": book.title,
+            "author": book.author,
+            "publisher": book.publisher} for book in books]
+        return JsonResponse(data = data, safe = False, status = 200)
