@@ -14,12 +14,8 @@ import axios from "axios";
 
 export default {
   data: () => ({
-    username: "",
+    username: document.getElementById("username").value,
   }),
-
-  created() {
-    this.username = document.getElementById("username").value;
-  },
 
   methods: {
     logout() {
@@ -41,5 +37,6 @@ export default {
 <style scoped>
 p {
   text-align: right;
+  padding-right: 20px;
 }
 </style>

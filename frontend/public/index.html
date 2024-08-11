@@ -10,7 +10,8 @@
   <body>
     <!-- csrf_token -->
     <input type="hidden" id="csrf_token" value="{% csrf_token %}">
-    <!-- User ID -->
+    <!-- User Info -->
+    <input type="hidden" id="user-id" value="{{ user.id }}">
     <input type="hidden" id="username" value="{{ user.username }}">
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
