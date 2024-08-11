@@ -6,8 +6,8 @@
 
     <v-main>
       <!-- contents -->
-      <AccountForm v-if="!isLoggedIn" @login-success="loginState()" />
-      <BookReviews v-if="isLoggedIn" />
+      <AccountForm v-if="me.username == null" />
+      <BookReviews v-else />
     </v-main>
     <v-footer app>
       <span>&copy; 2024 Chackit from Jeong-Ahram</span>
@@ -18,6 +18,7 @@
 <script>
 import AccountForm from "@/components/AccountForm.vue";
 import BookReviews from "@/components/BookReviews.vue";
+import axios from "axios";
 
 export default {
   components : {
@@ -26,12 +27,28 @@ export default {
   },
 
   data: () => ({
-    isLoggedIn: false, // 최초 로그인 상태
+    me: {}, // 응답 user 정보
   }),
 
+  created() {
+    // index.html 접속 시, 로그인 인증 정보 가져오기
+    this.getUserInfo();
+  },
+
   methods: {
-    loginState() {
-      this.isLoggedIn = true; // 로그인 성공 시
+    // 로그인 인증 정보 가져오기
+    getUserInfo() {
+      console.log("getUserInfo() 호출");
+      axios.get("/api/me")
+          .then(res => {
+            console.log("성공", res);
+            this.me = res.data; // Django에서 보내준 user 정보
+            console.log("me 데이터", this.me);
+          })
+          .catch(err => {
+            console.log("실패", err);
+            alert(err.response.status + " : " + err.response.statusText);
+          });
     },
   },
 }

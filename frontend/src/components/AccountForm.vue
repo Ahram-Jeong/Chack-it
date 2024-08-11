@@ -135,7 +135,7 @@ export default {
     password: null,
     loading: false,
     dialog: false,
-    me: {},
+    me: {}, // 응답 user 정보
   }),
 
   methods: {
@@ -156,13 +156,11 @@ export default {
       axios.post("/api/login/", postData)
           .then(res => {
             console.log("성공", res);
-            this.me = res.data;
-            // 성공 시 부모 컴포넌트로 로그인 상태 전달
-            this.$emit('login-success', true);
+            this.me = res.data; // Django에서 보내준 user 정보
           })
           .catch(err => {
             console.log("실패", err);
-            alert("로그인 실패");
+            alert("아이디, 비밀번호를 확인하세요.");
           });
     },
     // 회원가입
