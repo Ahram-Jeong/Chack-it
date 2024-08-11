@@ -13,4 +13,5 @@ urlpatterns = [
 
     # 도서
     path("book/search/", ApiSearchListView.as_view(), name = "search_book"),
+    path("book/<int:pk>/", ApiBookDetailView.as_view(), name = "detail_book"),
 ]

@@ -42,7 +42,7 @@
 
       <!-- 도서 검색 결과 -->
       <v-list>
-        <v-list-item v-for="book in books" :key="book.title" @click="detailBook()">
+        <v-list-item v-for="book in books" :key="book.title" @click="detailBook(book)">
           <v-list-item-title v-text="book.title" style="font-weight: bold;"></v-list-item-title>
           <v-list-item-subtitle>{{ book.author }}, {{ book.publisher }}</v-list-item-subtitle>
         </v-list-item>
@@ -52,7 +52,33 @@
 
       <v-card-actions class="pa-2" style="background-color: white;">
         <v-spacer></v-spacer>
-        <button class="text-grey text-decoration-none" @click="cancelSearch()">취소</button>
+        <button class="text-grey text-decoration-none" @click="closeDialog1()">취소</button>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- 도서 상세 정보 Dialog 2 -->
+  <v-dialog v-model="dialog2" class="mx-auto" max-width="300" persistent>
+    <v-card class="mx-auto" style="width: 100%; max-width: 300px;">
+      <v-img
+          :aspect-ratio="1"
+          :src="selectedBook.cover"
+          alt="book-img"
+          class="bg-white"
+          style="height: 125px; margin-top: 20px;"
+      ></v-img>
+
+      <v-card-title style="font-weight: bold;">{{ selectedBook.title }}</v-card-title>
+
+      <v-card-subtitle>{{ selectedBook.author }}</v-card-subtitle>
+      <v-card-subtitle>{{ selectedBook.publisher }}</v-card-subtitle>
+
+      <v-card-text>
+        {{ selectedBook.description }}
+      </v-card-text>
+      <v-card-actions>
+        <v-btn class="text-grey text-decoration-none" @click="closeDialog2()">취소</v-btn>
+        <v-btn class="text-white bg-black">작성</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -80,9 +106,11 @@ export default {
       { title: "Title 14", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
     ],
     showCount: 5,
-    books: [],
     searchKeyword: "",
-    dialog1: false,
+    books: [], // 도서 검색 결과
+    selectedBook: {}, // 선택 된 도서 정보
+    dialog1: false, // 검색 창
+    dialog2: false, // 도서 상세정보
   }),
 
   computed: {
@@ -97,11 +125,16 @@ export default {
       this.showCount += 5;
     },
 
-    // 검색 dialog 취소
-    cancelSearch() {
+    // dialog 취소
+    closeDialog1() {
       this.dialog1 = false;
       this.searchKeyword = "";
       this.books = [];
+    },
+
+    closeDialog2() {
+      this.dialog2 = false;
+      this.dialog1 = true;
     },
 
     // 도서 검색
@@ -123,8 +156,17 @@ export default {
     },
 
     // 도서 상세 정보
-    detailBook() {
-
+    detailBook(book) {
+      console.log("detailBook() 호출");
+      axios.get(`/api/book/${book.id}/`)
+          .then(res => {
+          console.log("detailBook() 성공", res);
+          this.selectedBook = res.data;
+          this.dialog1 = false;
+          this.dialog2 = true;
+          }).catch(err => {
+            console.log("detailBook() 실패", err);
+          });
     }
   }
 }

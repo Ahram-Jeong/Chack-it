@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import BaseCreateView
 
 from book.models import Book
@@ -81,10 +81,26 @@ class ApiSearchListView(ListView):
         return Book.objects.none()
 
     def render_to_response(self, context, **response_kwargs):
-        books = self.get_queryset()
+        books = self.get_queryset() # queryset 결과
         data = [{
             "id": book.id,
             "title": book.title,
             "author": book.author,
             "publisher": book.publisher} for book in books]
-        return JsonResponse(data = data, safe = False, status = 200)
+        return JsonResponse(data = data, safe = False)
+
+# 도서 상세 정보
+class ApiBookDetailView(DetailView):
+    model = Book
+
+    def render_to_response(self, context, **response_kwargs):
+        book = self.get_object()
+        data = {
+            'id': book.id,
+            'title': book.title,
+            'author': book.author,
+            'publisher': book.publisher,
+            'description': book.description,
+            'cover': book.cover,
+        }
+        return JsonResponse(data = data, safe = True)
