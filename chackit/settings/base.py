@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     # app 추가
     'users.apps.UsersConfig',
     'api.apps.ApiConfig',
+    'book.apps.BookConfig',
 ]
 
 MIDDLEWARE = [
