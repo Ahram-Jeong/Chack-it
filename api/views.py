@@ -1,8 +1,10 @@
-from django.contrib.auth import login, get_user, get_user_model
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import login, get_user, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import never_cache
 from django.views.generic.edit import BaseCreateView
 
 from users.forms import CustomUserCreationForm
@@ -39,6 +41,14 @@ class ApiMeView(View):
             }
         return JsonResponse(data = userDict, safe = True, status = 200)
 
+# 로그아웃
+class ApiLogoutView(LogoutView):
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        logout(request)
+        return JsonResponse(data = {}, safe=True, status=200)
+
+
 # 회원가입
 class ApiRegisterView(BaseCreateView):
     form_class = CustomUserCreationForm
@@ -56,6 +66,5 @@ class ApiRegisterView(BaseCreateView):
         # 오류 정보 담기
         errors = {
             field : error.get_json_data() for (field, error) in form.errors.items()
-
         }
         return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)

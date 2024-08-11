@@ -6,9 +6,11 @@
 
     <v-main>
       <!-- contents -->
-      <AccountForm v-if="me.username == null" />
-      <BookReviews v-else />
+      <UserInfo v-if="me.username != null" />
+      <BookReviews v-if="me.username != null" />
+      <AccountForm v-else />
     </v-main>
+
     <v-footer app>
       <span>&copy; 2024 Chackit from Jeong-Ahram</span>
     </v-footer>
@@ -17,12 +19,14 @@
 
 <script>
 import AccountForm from "@/components/AccountForm.vue";
+import UserInfo from "@/components/UserInfo.vue";
 import BookReviews from "@/components/BookReviews.vue";
 import axios from "axios";
 
 export default {
   components : {
     AccountForm,
+    UserInfo,
     BookReviews,
   },
 
