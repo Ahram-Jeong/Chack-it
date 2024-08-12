@@ -98,7 +98,7 @@
         <v-container>
           <v-textarea label="Book Review" v-model="review"></v-textarea>
         </v-container>
-        <v-card-actions>
+        <v-card-actions class="justify-center">
           <v-btn class="text-grey text-decoration-none" @click="closeDialog3()">취소</v-btn>
           <v-btn class="text-white bg-black" @click="postReview(bookId)">등록</v-btn>
         </v-card-actions>
@@ -232,6 +232,9 @@ export default {
         this.bookId = "";
       }).catch(err => {
         console.log("postReview() 실패", err);
+        if (err.response.data.error == "EMPTY ERROR") {
+          alert("내용을 입력해주세요😅");
+        }
       });
     },
 

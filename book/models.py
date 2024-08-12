@@ -14,4 +14,4 @@ class Book(models.Model):
     publisher = models.CharField(max_length = 255)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} | {self.author}"

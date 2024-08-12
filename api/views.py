@@ -132,6 +132,12 @@ class ApiReviewCreateView(CreateView):
         except Book.DoesNotExist:
             return JsonResponse({"error": "Book 404"}, status = 404)
 
+        # null 값 혹은 빈 문자열 일 경우 오류 반환
+        # 원래는 model에 제약 조건이 걸려 있어 오류가 발생해야 하지만,
+        # api 요청은 폼 검증을 거치지 않고, 직접적으로 모델에 데이터를 저장할 수 있기 때문에 추가 검증이 필요
+        if (review_content == None or review_content == "") :
+            return JsonResponse({"error": "EMPTY ERROR"}, status = 400)
+
         # Review 객체 생성
         review = Review.objects.create(
             review_rating = review_rating,
