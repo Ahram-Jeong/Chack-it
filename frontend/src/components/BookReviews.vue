@@ -58,8 +58,8 @@
   </v-dialog>
 
   <!-- 도서 상세 정보 Dialog 2 -->
-  <v-dialog v-model="dialog2" class="mx-auto" max-width="300" persistent>
-    <v-card class="mx-auto" style="width: 100%; max-width: 300px;">
+  <v-dialog v-model="dialog2" class="mx-auto" max-width="500" persistent>
+    <v-card class="mx-auto" style="max-width: 500px;">
       <v-img
           :aspect-ratio="1"
           :src="selectedBook.cover"
@@ -78,8 +78,31 @@
       </v-card-text>
       <v-card-actions>
         <v-btn class="text-grey text-decoration-none" @click="closeDialog2()">취소</v-btn>
-        <v-btn class="text-white bg-black">작성</v-btn>
+        <v-btn class="text-white bg-black" @click="createReview(selectedBook)">작성</v-btn>
       </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <!-- 독서 기록 작성 -->
+  <v-dialog v-model="dialog3" class="mx-auto" max-width="500">
+    <v-card class="mx-auto" style="width: 500px;">
+      <v-card-title style="font-weight: bold;">{{ selectedBook.title }}</v-card-title>
+      <v-card-subtitle>{{ selectedBook.author }}</v-card-subtitle>
+      <v-card-subtitle>{{ selectedBook.publisher }}</v-card-subtitle>
+      <!-- 독서 기록 폼 -->
+      <v-form id="review-form" ref="reviewForm">
+        <v-rating
+            v-model="rating"
+            hover
+        ></v-rating>
+        <v-container>
+          <v-textarea label="Book Review" v-model="review"></v-textarea>
+        </v-container>
+        <v-card-actions>
+          <v-btn class="text-grey text-decoration-none" @click="closeDialog3()">취소</v-btn>
+          <v-btn class="text-white bg-black" @click="postReview()">등록</v-btn>
+        </v-card-actions>
+      </v-form>
     </v-card>
   </v-dialog>
 </template>
@@ -111,6 +134,9 @@ export default {
     selectedBook: {}, // 선택 된 도서 정보
     dialog1: false, // 검색 창
     dialog2: false, // 도서 상세정보
+    dialog3: false, // 독서 기록
+    rating: 0, // 평점
+    review: "", // 리뷰
   }),
 
   computed: {
@@ -135,6 +161,13 @@ export default {
     closeDialog2() {
       this.dialog2 = false;
       this.dialog1 = true;
+    },
+
+    closeDialog3() {
+      this.dialog3 = false;
+      this.dialog2 = true;
+      this.rating = 0;
+      this.review = "";
     },
 
     // 도서 검색
@@ -167,7 +200,23 @@ export default {
           }).catch(err => {
             console.log("detailBook() 실패", err);
           });
-    }
+    },
+
+    // 독서 기록 작성
+    createReview() {
+      this.dialog3 = true;
+    },
+
+    // 독서 기록 등록
+    postReview() {
+      this.dialog1 = false;
+      this.dialog2 = false;
+      this.dialog3 = false;
+      this.searchKeyword = "";
+      this.books = [];
+      this.rating = 0;
+      this.review = "";
+    },
   }
 }
 </script>
