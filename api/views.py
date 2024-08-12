@@ -4,11 +4,14 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 from django.views.generic.edit import BaseCreateView
+import json
 
 from book.models import Book
+from review.models import Review
 from users.forms import CustomUserCreationForm
+from users.models import User
 
 
 # Create your views here.
@@ -96,11 +99,62 @@ class ApiBookDetailView(DetailView):
     def render_to_response(self, context, **response_kwargs):
         book = self.get_object()
         data = {
-            'id': book.id,
-            'title': book.title,
-            'author': book.author,
-            'publisher': book.publisher,
-            'description': book.description,
-            'cover': book.cover,
+            "id": book.id,
+            "title": book.title,
+            "author": book.author,
+            "publisher": book.publisher,
+            "description": book.description,
+            "cover": book.cover,
+        }
+        return JsonResponse(data = data, safe = True)
+
+# 리뷰 작성
+class ApiReviewCreateView(CreateView):
+    model = Review
+    fields = ["review_rating", "review_content"]
+
+    def post(self, request, *args, **kwargs):
+        # Vue.js에서 JSON 형식으로 데이터를 보냈기 때문에 JSON 데이터 로드
+        postData = json.loads(request.body)
+
+        # 요청 데이터에서 데이터 추출
+        review_rating = postData.get("review_rating")
+        review_content = postData.get("review_content")
+        user_id = int(postData.get("user_id"))
+        book_id = int(postData.get("book_id"))
+
+        # FK 참조로 User와 Book 인스턴스 가져오기
+        try:
+            user = User.objects.get(id = user_id)
+            book = Book.objects.get(id = book_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User 404"}, status = 404)
+        except Book.DoesNotExist:
+            return JsonResponse({"error": "Book 404"}, status = 404)
+
+        # Review 객체 생성
+        review = Review.objects.create(
+            review_rating = review_rating,
+            review_content = review_content,
+            user = user,
+            book = book
+        )
+
+        # 응답할 Review 객체를 JSON으로 변환
+        data = {
+            "id": review.id,
+            "review_rating": review.review_rating,
+            "review_content": review.review_content,
+            "review_date": review.review_date.isoformat(),
+            "user": {
+                "id": user.id,
+            },
+            "book": {
+                "id": book.id,
+                "cover": book.cover,
+                "title": book.title,
+                "author": book.author,
+                "publisher": book.publisher,
+            }
         }
         return JsonResponse(data = data, safe = True)

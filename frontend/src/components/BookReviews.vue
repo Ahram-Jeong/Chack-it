@@ -100,7 +100,7 @@
         </v-container>
         <v-card-actions>
           <v-btn class="text-grey text-decoration-none" @click="closeDialog3()">취소</v-btn>
-          <v-btn class="text-white bg-black" @click="postReview()">등록</v-btn>
+          <v-btn class="text-white bg-black" @click="postReview(bookId)">등록</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -137,6 +137,8 @@ export default {
     dialog3: false, // 독서 기록
     rating: 0, // 평점
     review: "", // 리뷰
+    bookId: "",
+    userId: document.getElementById("user-id").value,
   }),
 
   computed: {
@@ -203,20 +205,36 @@ export default {
     },
 
     // 독서 기록 작성
-    createReview() {
+    createReview(selectedBook) {
       this.dialog3 = true;
+      this.bookId = selectedBook.id;
     },
 
     // 독서 기록 등록
-    postReview() {
-      this.dialog1 = false;
-      this.dialog2 = false;
-      this.dialog3 = false;
-      this.searchKeyword = "";
-      this.books = [];
-      this.rating = 0;
-      this.review = "";
+    postReview(bookId) {
+      console.log("postReview() 호출");
+      axios.post("/api/review/create/", {
+        review_rating: this.rating,
+        review_content: this.review,
+        book_id: bookId,
+        user_id: this.userId,
+      }).then(res => {
+        console.log("postReview() 성공", res);
+        this.selectedBook = res.data;
+        alert("작성 완료!🎉");
+        this.dialog1 = false;
+        this.dialog2 = false;
+        this.dialog3 = false;
+        this.searchKeyword = "";
+        this.books = [];
+        this.rating = 0;
+        this.review = "";
+        this.bookId = "";
+      }).catch(err => {
+        console.log("postReview() 실패", err);
+      });
     },
+
   }
 }
 </script>
