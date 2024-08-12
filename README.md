@@ -5,7 +5,7 @@
 
 - [💡 Chackit 프로젝트 기획서](https://ahram-jeong.notion.site/Chack-it-138ef17d41af4200b659c7520a56dc3d?pvs=4)</br>
 ### 1. 개요
-✔ **Python-Django**와 Vue.js를 사용하여 독서 기록 및 도서 추천 SPA 개인 프로젝트
+✔ **Python-Django**와 Vue.js를 사용한 독서 기록 및 도서 추천 SPA 개인 프로젝트
 ### 2. 수행 기간
 📅 2024년 7월 19일 (금) ~ 진행 중
 ### 3. 개발 환경
@@ -31,12 +31,12 @@
 >- 회원 가입/탈퇴, 회원 정보 변경
 >- 로그인, 로그아웃
 > #### 독서 기록
->- 독서 기록 등록/수정/삭제
+>- 독서 기록 등록/조회/수정/삭제
 >- 도서 검색
 >- 도서 상세 정보
 > #### 도서 추천
 >- 평점 기반 도서 추천
->    - **머신러닝** 콘텐츠 기반 필터링 활용, 추천 알고리즘 구현
+>    - **머신러닝**의 콘텐츠 기반 필터링 활용, 추천 알고리즘 구현
 ### 5. URL 설계
 |  | URL | View | 기능 |
 |---|:---|:---|:---|
@@ -48,9 +48,9 @@
 |  | /api/account/<<int:pk>> | ApiUserDetailView | 회원 정보 |
 |  | /api/account/<<int:pk>>/update | ApiUserUpdateView | 회원 정보 수정 |
 |  | /api/account/<<int:pk>>/delete | ApiUserDeleteView | 회원 탈퇴 |
+|  | /api/account/<<int:pk>>/recommend | ApiRecommendView | 맞춤 도서 추천 |
 | `book` | /api/book/search | ApiSearchListView | 도서 검색 |
 |  | /api/book/<<int:pk>> | ApiBookDetailView | 도서 상세 정보 |
-|  | /api/book/<<int:pk>>/recommend | ApiBookRecommendView | 맞춤 도서 추천 |
 | `review` | /api/review/create | ApiReviewCreateView | 독서 기록 등록 |
 |  | /api/review/list | ApiReviewListView | 독서 기록 리스트 |
 |  | /api/review/<<int:pk>> | ApiReviewDetailView | 독서 기록 상세 정보 |
