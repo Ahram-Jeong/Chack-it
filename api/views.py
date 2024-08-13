@@ -13,6 +13,7 @@ from book.models import Book
 from review.models import Review
 from users.forms import CustomUserCreationForm
 from users.models import User
+from users.views import CustomLoginRequiredMixin
 
 
 # Create your views here.
@@ -75,7 +76,7 @@ class ApiRegisterView(BaseCreateView):
         return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)
 
 # 도서 검색
-class ApiSearchListView(ListView):
+class ApiSearchListView(CustomLoginRequiredMixin, ListView):
     model = Book
 
     def get_queryset(self):
@@ -94,7 +95,7 @@ class ApiSearchListView(ListView):
         return JsonResponse(data = data, safe = False)
 
 # 도서 상세 정보
-class ApiBookDetailView(DetailView):
+class ApiBookDetailView(CustomLoginRequiredMixin, DetailView):
     model = Book
 
     def render_to_response(self, context, **response_kwargs):
@@ -110,7 +111,7 @@ class ApiBookDetailView(DetailView):
         return JsonResponse(data = data, safe = True)
 
 # 리뷰 작성
-class ApiReviewCreateView(CreateView):
+class ApiReviewCreateView(CustomLoginRequiredMixin, CreateView):
     model = Review
     fields = ["review_rating", "review_content"]
 
