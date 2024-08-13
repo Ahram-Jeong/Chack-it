@@ -5,7 +5,7 @@
 
 - [💡 Chackit 프로젝트 기획서](https://ahram-jeong.notion.site/Chack-it-138ef17d41af4200b659c7520a56dc3d?pvs=4)</br>
 ### 1. 개요
-✔ **Python-Django**와 Vue.js를 사용한 독서 기록 및 도서 추천 SPA 개인 프로젝트
+✔ **Python-Django**와 Vue.js, 머신러닝을 구현한 독서 기록 및 도서 추천 SPA 개인 프로젝트
 ### 2. 수행 기간
 📅 2024년 7월 19일 (금) ~ 진행 중
 ### 3. 개발 환경
@@ -22,7 +22,7 @@
 > <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
 
 > #### Skills
-> <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=Python&logoColor=ffdd54"><img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"><br/><img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"><img src="https://img.shields.io/badge/pandas-%23150458?style=for-the-badge&logo=pandas&logoColor=white"><img src="https://img.shields.io/badge/numpy-%23013243?style=for-the-badge&logo=numpy&logoColor=white"><br/><img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=Vue.js&logoColor=white"><img src="https://img.shields.io/badge/Vuetify-1867C0?style=for-the-badge&logo=Vuetify&logoColor=white"><img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=Node.js&logoColor=white"><img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"><br/><img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"><img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white">
+> <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=Python&logoColor=ffdd54"><img src="https://img.shields.io/badge/django-092E20?style=for-the-badge&logo=django&logoColor=white"><br/><img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"><br/><img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=Vue.js&logoColor=white"><img src="https://img.shields.io/badge/Vuetify-1867C0?style=for-the-badge&logo=Vuetify&logoColor=white"><img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white"><br/><img src="https://img.shields.io/badge/html5-E34F26?style=for-the-badge&logo=html5&logoColor=white"><img src="https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css3&logoColor=white">
 
 > #### etc.
 > <img src="https://img.shields.io/badge/postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"><img src="https://img.shields.io/badge/Anaconda-%2344A833?style=for-the-badge&logo=anaconda&logoColor=white"><img src="https://img.shields.io/badge/jupyter-%23FA0F00?style=for-the-badge&logo=jupyter&logoColor=white">
@@ -60,11 +60,9 @@
 >- Python 3.12
 >- Django 5.0.7
 >- scikit-learn
->- Pandas, Numpy
 >- SQLite
 >- Vue.js 3.2
 >- Vuetify 3.0
 >- Axios
->- Node.js
 >- Javascript
 >- HTML, CSS

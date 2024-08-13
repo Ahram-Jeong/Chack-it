@@ -1,4 +1,5 @@
 from django.contrib.auth import login, get_user, logout
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -164,3 +165,31 @@ class ApiReviewCreateView(CreateView):
             }
         }
         return JsonResponse(data = data, safe = True)
+
+# 사용자 리뷰 리스트
+class ApiReviewListView(UserPassesTestMixin, ListView):
+    model = Review
+    context_object_name = "reviews" # 템플릿에서 사용할 이름
+    
+    # 검증 : 인증 된(로그인 한) 사용자 여부
+    def test_func(self):
+        return self.request.user.is_authenticated
+
+    def get_queryset(self):
+        return Review.objects.filter(user = self.request.user).select_related("book").order_by("-id")
+
+    def render_to_response(self, context, **response_kwargs):
+        # JSON 데이터 반환
+        # context["reviews"] : CBV에서 템플릿 렌더링이나 응답을 구성할 때 사용되는 컨텍스트 데이터
+        # values() : 조인한 테이블의 모든 필드가 아닌 명시된 필드만 추출, 성능면에서 더 좋음
+        data = context["reviews"].values(
+            "id",
+            "review_rating",
+            "review_content",
+            "review_date",
+            "book__title",  # book.title
+            "book__author",  # book.author
+            "book__cover"  # book.cover
+        )
+        review_list = list(data)
+        return JsonResponse({"reviews": review_list})

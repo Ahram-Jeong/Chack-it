@@ -17,4 +17,5 @@ urlpatterns = [
     
     # 리뷰
     path("review/create/", ApiReviewCreateView.as_view(), name = "create_review"),
+    path("review/list/", ApiReviewListView.as_view(), name = "review_list"),
 ]

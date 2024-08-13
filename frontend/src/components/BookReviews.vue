@@ -8,14 +8,30 @@
       </div>
       <button @click="dialog1 = true" class="btn btn-basic" type="button">글쓰기</button>
     </div>
-    <div class="reviews-container">
-      <div class="review" v-for="review in displayedReviews" :key="review.title">
-        <h3>{{ review.title }}</h3>
-        <p>{{ review.body }}</p>
-      </div>
-    </div>
+    <!-- 작성 된 리뷰 -->
+    <v-text v-if="reviews.length === 0">
+      서재에 독서 기록을 등록해주세요.
+    </v-text>
+    <v-row>
+      <v-col v-for="rv in showReviews" :key="rv.id">
+        <v-card class="mx-auto" max-width="344" hover>
+          <v-col>
+            <v-img :src="rv.book__cover" alt="book-img" height="125px"></v-img>
+          </v-col>
+          <v-col>
+            <v-card-title v-text="rv.book__title"></v-card-title>
+            <v-card-subtitle>{{ rv.book__author }}</v-card-subtitle>
+            <v-rating v-model="rv.review_rating" readonly></v-rating>
+            <v-card-text class="review-content">{{ rv.review_content }}</v-card-text>
+          </v-col>
+        </v-card>
+      </v-col>
+    </v-row>
     <div class="btn-more-div">
-      <button v-if="reviews.length > displayedReviews.length" @click="loadMore()" class="btn-more" type="button">더보기</button>
+      <button v-if="reviews.length > showReviews.length"
+              @click="loadMore()"
+              class="btn-more"
+              type="button">더보기</button>
     </div>
   </div>
 
@@ -42,7 +58,7 @@
 
       <!-- 도서 검색 결과 -->
       <v-list>
-        <v-list-item v-for="book in books" :key="book.title" @click="detailBook(book)">
+        <v-list-item v-for="book in books" :key="book.id" @click="detailBook(book)">
           <v-list-item-title v-text="book.title" style="font-weight: bold;"></v-list-item-title>
           <v-list-item-subtitle>{{ book.author }}, {{ book.publisher }}</v-list-item-subtitle>
         </v-list-item>
@@ -91,10 +107,7 @@
       <v-card-subtitle>{{ selectedBook.publisher }}</v-card-subtitle>
       <!-- 독서 기록 폼 -->
       <v-form id="review-form" ref="reviewForm">
-        <v-rating
-            v-model="rating"
-            hover
-        ></v-rating>
+        <v-rating v-model="rating" hover></v-rating>
         <v-container>
           <v-textarea label="Book Review" v-model="review"></v-textarea>
         </v-container>
@@ -112,45 +125,35 @@ import axios from "axios";
 
 export default {
   data: () => ({
-    reviews: [
-      { title: "Title 1", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 2", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 3", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 4", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 5", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 6", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 7", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 8", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 9", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 10", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 11", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 12", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 13", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-      { title: "Title 14", body: "Body text for whatever you’d like to say. Add main takeaway points, quotes, anecdotes, or even a very very short story." },
-    ],
-    showCount: 5,
+    reviews: [], // 사용자 리뷰 리스트
+    rvCount: 5, // 더보기 카운드
     searchKeyword: "",
     books: [], // 도서 검색 결과
     selectedBook: {}, // 선택 된 도서 정보
     dialog1: false, // 검색 창
     dialog2: false, // 도서 상세정보
-    dialog3: false, // 독서 기록
+    dialog3: false, // 리뷰 작성
     rating: 0, // 평점
     review: "", // 리뷰
     bookId: "",
     userId: document.getElementById("user-id").value,
   }),
 
+  mounted() {
+    // 사용자 리뷰 리스트 출력
+    this.fetchReviews();
+  },
+
   computed: {
-    displayedReviews() {
-      return this.reviews.slice(0, this.showCount);
+    showReviews() {
+      return this.reviews.slice(0, this.rvCount);
     }
   },
 
   methods: {
     // 더보기
     loadMore() {
-      this.showCount += 5;
+      this.rvCount += 5;
     },
 
     // dialog 취소
@@ -204,13 +207,13 @@ export default {
           });
     },
 
-    // 독서 기록 작성
+    // 책 리뷰 작성
     createReview(selectedBook) {
       this.dialog3 = true;
       this.bookId = selectedBook.id;
     },
 
-    // 독서 기록 등록
+    // 책 리뷰 등록
     postReview(bookId) {
       console.log("postReview() 호출");
       axios.post("/api/review/create/", {
@@ -230,6 +233,7 @@ export default {
         this.rating = 0;
         this.review = "";
         this.bookId = "";
+        this.fetchReviews();
       }).catch(err => {
         console.log("postReview() 실패", err);
         if (err.response.data.error == "EMPTY ERROR") {
@@ -238,6 +242,17 @@ export default {
       });
     },
 
+    // 사용자 리뷰 리스트
+    fetchReviews() {
+      console.log("fetchReviews() 호출");
+      axios.get("/api/review/list/")
+          .then(res => {
+            console.log("fetchReviews() 성공", res);
+            this.reviews = res.data.reviews;
+          }).catch(err => {
+            console.log("fetchReviews() 실패", err);
+          });
+      },
   }
 }
 </script>
@@ -257,18 +272,6 @@ export default {
 
 .header-container h2 {
   margin-right: 10px;
-}
-
-.reviews-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.review {
-  flex: 1 0 20%; /* 1행 당 5개의 리뷰 */
-  box-sizing: border-box;
-  padding: 20px;
-  text-align: left;
 }
 
 button {
@@ -293,5 +296,11 @@ button {
 .btn-more-div {
   display: flex;
   justify-content: center;
+}
+
+.review-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>
