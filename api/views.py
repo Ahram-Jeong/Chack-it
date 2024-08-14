@@ -8,6 +8,10 @@ from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, DetailView, CreateView
 from django.views.generic.edit import BaseCreateView
 import json
+import random
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from book.models import Book
 from review.models import Review
@@ -194,3 +198,74 @@ class ApiReviewListView(UserPassesTestMixin, ListView):
         )
         review_list = list(data)
         return JsonResponse({"reviews": review_list})
+
+# 도서 추천
+class ApiRecommendView(UserPassesTestMixin, ListView):
+    # 인증 여부 확인
+    def test_func(self):
+        return self.request.user.is_authenticated
+
+    # 확인 후 추가 로직
+    def get_queryset(self):
+        # 1. 로그인한 사용자의 리뷰 중 평점이 3점 이상인 책의 id 가져오기
+        return Review.objects.filter(user=self.request.user, review_rating__gte=3).select_related("book").values("book__id")
+
+    def get(self, request):
+        # get_queryset() 으로 필터링된 리뷰 가져오기
+        review_books = self.get_queryset()
+        print(review_books, len(review_books))
+
+        # 필터링 결과가 없다면 빈 리스트 반환
+        if not review_books.exists():
+            return JsonResponse(data = {"recommend_books": [], "filtered_book": ""}, safe = False)
+
+        # 2. 책의 id 중 하나를 랜덤으로 선택
+        select_one_book = random.choice(review_books)
+        # 선택 된 책의 id 추출
+        select_one_book_id = select_one_book["book__id"]
+        print(f"==============================================={select_one_book_id}")
+
+        # 3. 모든 책의 "categoryName" 필드 추출
+        books = list(Book.objects.all()) # QuerySet 결과를 리스트로 변환
+        categories = [book.categoryName for book in books]
+
+        # 4. 문서-단어 행렬 생성
+        vectorizer = CountVectorizer()
+        cnt_matrix = vectorizer.fit_transform(categories)
+
+        # 5. 코사인 유사도 계산
+        cosine_sim = cosine_similarity(cnt_matrix, cnt_matrix)
+
+        # 6. 선택된 책 ID에 해당하는 책의 인덱스 찾기
+        # DB의 id와 파이썬 리스트나 행렬의 위치를 나타내는 인덱스가 다르기 때문
+        # 유사도 행렬에서는 행렬의 인덱스를 사용해야 함
+        book_idx = next(i for i, book in enumerate(books) if book.id == select_one_book_id)
+
+        # 6. 유사한 컨텐츠 추출 함수
+        def get_similar_books(idx, sim_matrix, top_n = 10):
+            sim_scores = list(enumerate(sim_matrix[idx]))
+            sim_scores = sorted(sim_scores, key = lambda x: x[1], reverse = True)
+            sim_scores = [score for score in sim_scores if score[0] != idx]  # 자기 자신 제외
+            sim_scores = sim_scores[:top_n]  # 상위 top_n개
+            similar_indices = [i[0] for i in sim_scores]
+            return similar_indices
+
+        # 6. 선택된 책의 id를 기반으로 유사한 책 추천
+        similar_books = get_similar_books(book_idx, cosine_sim)
+
+        # 7. 추천된 책 정보 반환
+        recommend_books = [books[idx] for idx in similar_books]
+        data = [
+            {
+                "title": book.title,
+                "author": book.author,
+                "link": book.link,
+                "cover": book.cover,
+                "description": book.description
+            } for book in recommend_books
+        ]
+
+        # 8. 추가 - 랜덤 선택 된 필터링 도서 제목 반환
+        filtered_book_title = next(book.title for book in books if book.id == select_one_book_id)
+
+        return JsonResponse(data = {"recommend_books": data, "filtered_book": filtered_book_title}, safe = False)

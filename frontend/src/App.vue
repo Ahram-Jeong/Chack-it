@@ -7,6 +7,7 @@
     <v-main>
       <!-- contents -->
       <UserInfo v-if="me.username != null" />
+      <BookRecommendation v-if="me.username != null" />
       <BookReviews v-if="me.username != null" />
       <AccountForm v-else />
     </v-main>
@@ -21,6 +22,7 @@
 import AccountForm from "@/components/AccountForm.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import BookReviews from "@/components/BookReviews.vue";
+import BookRecommendation from "@/components/BookRecommendation.vue";
 import axios from "axios";
 
 export default {
@@ -28,6 +30,7 @@ export default {
     AccountForm,
     UserInfo,
     BookReviews,
+    BookRecommendation,
   },
 
   data: () => ({

@@ -10,7 +10,7 @@
     </div>
     <!-- 작성 된 리뷰 -->
     <v-text v-if="reviews.length === 0">
-      서재에 독서 기록을 등록해주세요.
+      읽으신 책 리뷰를 등록해주세요.
     </v-text>
     <v-row>
       <v-col v-for="rv in showReviews" :key="rv.id">
@@ -145,13 +145,14 @@ export default {
   },
 
   computed: {
+    // 더보기
     showReviews() {
       return this.reviews.slice(0, this.rvCount);
     }
   },
 
   methods: {
-    // 더보기
+    // 추가 더보기
     loadMore() {
       this.rvCount += 5;
     },
@@ -233,7 +234,8 @@ export default {
         this.rating = 0;
         this.review = "";
         this.bookId = "";
-        this.fetchReviews();
+        // this.fetchReviews();
+        window.location.href = "/";
       }).catch(err => {
         console.log("postReview() 실패", err);
         if (err.response.data.error == "EMPTY ERROR") {
