@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, DetailView, CreateView
-from django.views.generic.edit import BaseCreateView
+from django.views.generic.edit import BaseCreateView, BaseDeleteView
 import json
 import random
 
@@ -226,6 +226,22 @@ class ApiReviewDetailView(UserPassesTestMixin, DetailView):
             "review_content": review.review_content,
         }
         return JsonResponse(data = data, safe = True)
+
+# 리뷰 삭제
+class ApiReviewDeleteView(UserPassesTestMixin, BaseDeleteView):
+    model = Review
+
+    def test_func(self):
+        review = self.get_object()  # 현재의 리뷰 객체 가져오기
+        return self.request.user.is_authenticated and review.user == self.request.user
+
+    def get_object(self):
+        return get_object_or_404(Review, pk = self.kwargs["pk"])
+
+    def delete(self, request, *args, **kwargs):
+        review = self.get_object()
+        review.delete()
+        return JsonResponse(data = {}, safe = True, status = 204)
 
 ###################################################################################################################################
 # 머신러닝의 콘텐츠 기반 필터링 : 도서 추천

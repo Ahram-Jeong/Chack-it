@@ -38,6 +38,9 @@
   <!-- 리뷰 상세 조회 -->
   <v-dialog v-model="dialog4" class="mx-auto" max-width="500">
     <v-card class="mx-auto" style="width: 500px;">
+      <!-- 삭제 버튼  -->
+      <v-btn @click="deleteReview(selectedReview.id)" icon="mdi-delete-outline" elevation="0" style="margin-left: 10px"></v-btn>
+      <!-- 리뷰 조회  -->
       <v-col>
         <v-img :src="selectedReview.cover" alt="book-img" height="125px"></v-img>
       </v-col>
@@ -298,9 +301,27 @@ export default {
       });
     },
 
+    // 리뷰 수정
     updateReview() {
 
     },
+
+    // 리뷰 삭제
+    deleteReview(rvId) {
+      const result = confirm("삭제 하시겠습니까?");
+      if (result) {
+        console.log("deleteReview() 호출");
+        axios.delete(`/api/review/delete/${rvId}/`)
+            .then(res => {
+              console.log("deleteReview() 성공", res);
+              this.dialog4 = false;
+              alert("삭제 되었습니다.");
+              this.fetchReviews();
+            }).catch(err => {
+          console.log("deleteReview() 실패", err);
+        });
+      }
+    }
   }
 }
 </script>
