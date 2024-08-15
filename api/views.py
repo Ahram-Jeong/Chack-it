@@ -2,6 +2,7 @@ from django.contrib.auth import login, get_user, logout
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
@@ -199,7 +200,35 @@ class ApiReviewListView(UserPassesTestMixin, ListView):
         review_list = list(data)
         return JsonResponse({"reviews": review_list})
 
-# 도서 추천
+# 리뷰 상세 조회
+class ApiReviewDetailView(UserPassesTestMixin, DetailView):
+    model = Review
+
+    def test_func(self):
+        review = self.get_object()  # 현재의 리뷰 객체 가져오기
+        return self.request.user.is_authenticated and review.user == self.request.user
+
+    # get_queryset() : 결과에 대한 리스트 반환
+    # get_object() : 단일 객체 반환
+    def get_object(self):
+        # URL로 전달 된 Review PK로 객체 조회
+        return get_object_or_404(Review.objects.select_related("book", "user"), pk = self.kwargs["pk"])
+
+    def render_to_response(self, context, **response_kwargs):
+        review = self.get_object() # 현재의 리뷰 객체 가져오기
+        data = {
+            "id": review.id,
+            "cover": review.book.cover,
+            "title": review.book.title,
+            "author": review.book.author,
+            "publisher": review.book.publisher,
+            "review_rating": review.review_rating,
+            "review_content": review.review_content,
+        }
+        return JsonResponse(data = data, safe = True)
+
+###################################################################################################################################
+# 머신러닝의 콘텐츠 기반 필터링 : 도서 추천
 class ApiRecommendView(UserPassesTestMixin, ListView):
     # 인증 여부 확인
     def test_func(self):

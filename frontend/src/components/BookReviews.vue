@@ -8,13 +8,13 @@
       </div>
       <button @click="dialog1 = true" class="btn btn-basic" type="button">글쓰기</button>
     </div>
-    <!-- 작성 된 리뷰 -->
+    <!-- 작성 된 리뷰 목록 -->
     <v-text v-if="reviews.length === 0">
       읽으신 책 리뷰를 등록해주세요.
     </v-text>
     <v-row>
       <v-col v-for="rv in showReviews" :key="rv.id">
-        <v-card class="mx-auto" max-width="344" hover>
+        <v-card class="mx-auto" max-width="344" hover @click="detailReview(rv)">
           <v-col>
             <v-img :src="rv.book__cover" alt="book-img" height="125px"></v-img>
           </v-col>
@@ -35,7 +35,30 @@
     </div>
   </div>
 
-  <!-- 글쓰기 Dialog 1 -->
+  <!-- 리뷰 상세 조회 -->
+  <v-dialog v-model="dialog4" class="mx-auto" max-width="500">
+    <v-card class="mx-auto" style="width: 500px;">
+      <v-col>
+        <v-img :src="selectedReview.cover" alt="book-img" height="125px"></v-img>
+      </v-col>
+      <v-card-title v-text="selectedReview.title"></v-card-title>
+      <v-card-subtitle>{{ selectedReview.author }}</v-card-subtitle>
+      <v-card-subtitle>{{ selectedReview.publisher }}</v-card-subtitle>
+      <!-- 독서 기록 폼 -->
+      <v-form id="review-form" ref="reviewForm">
+        <v-rating v-model="selectedReview.review_rating" hover></v-rating>
+        <v-container>
+          <v-textarea label="Book Review" v-model="selectedReview.review_content"></v-textarea>
+        </v-container>
+        <v-card-actions class="justify-center">
+          <v-btn class="text-grey text-decoration-none" @click="closeDialog4()">취소</v-btn>
+          <v-btn class="text-white bg-black" @click="updateReview(selectedReview)">수정</v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-dialog>
+
+  <!-- 글쓰기 -->
   <v-dialog v-model="dialog1" class="mx-auto" max-width="500">
     <v-card>
       <v-toolbar color="white" flat>
@@ -73,7 +96,7 @@
     </v-card>
   </v-dialog>
 
-  <!-- 도서 상세 정보 Dialog 2 -->
+  <!-- 도서 상세 정보 -->
   <v-dialog v-model="dialog2" class="mx-auto" max-width="500" persistent>
     <v-card class="mx-auto" style="max-width: 500px;">
       <v-img
@@ -125,14 +148,16 @@ import axios from "axios";
 
 export default {
   data: () => ({
-    reviews: [], // 사용자 리뷰 리스트
     rvCount: 5, // 더보기 카운드
+    reviews: [], // 사용자 리뷰 리스트
+    selectedReview: {}, // 상세 리뷰
     searchKeyword: "",
     books: [], // 도서 검색 결과
     selectedBook: {}, // 선택 된 도서 정보
     dialog1: false, // 검색 창
     dialog2: false, // 도서 상세정보
     dialog3: false, // 리뷰 작성
+    dialog4: false, // 리뷰 조회
     rating: 0, // 평점
     review: "", // 리뷰
     bookId: "",
@@ -174,6 +199,10 @@ export default {
       this.dialog2 = true;
       this.rating = 0;
       this.review = "";
+    },
+
+    closeDialog4() {
+      this.dialog4 = false;
     },
 
     // 도서 검색
@@ -255,6 +284,23 @@ export default {
             console.log("fetchReviews() 실패", err);
           });
       },
+
+    // 리뷰 상세 조회
+    detailReview(rv) {
+      console.log("detailReview() 호출");
+      axios.get(`/api/review/${rv.id}/`)
+          .then(res => {
+            console.log("detailReview() 성공", res);
+            this.selectedReview = res.data;
+            this.dialog4 = true;
+          }).catch(err => {
+        console.log("detailReview() 실패", err);
+      });
+    },
+
+    updateReview() {
+
+    },
   }
 }
 </script>
