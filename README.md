@@ -46,16 +46,16 @@
 |  | /api/me | ApiMeView | 인증 정보 확인 |
 |  | /api/account/create | ApiRegisterView | 회원 가입 |
 |  | /api/account/<<int:pk>> | ApiUserDetailView | 회원 정보 |
-|  | /api/account/update/<<int:pk>> | ApiUserUpdateView | 회원 정보 수정 |
-|  | /api/account/delete/<<int:pk>> | ApiUserDeleteView | 회원 탈퇴 |
+|  | /api/account/<<int:pk>>/update | ApiUserUpdateView | 회원 정보 수정 |
+|  | /api/account/<<int:pk>>/delete | ApiUserDeleteView | 회원 탈퇴 |
 | `book` | /api/book/search | ApiSearchListView | 도서 검색 |
 |  | /api/book/<<int:pk>> | ApiBookDetailView | 도서 상세 정보 |
 |  | /api/book/recommend | ApiRecommendView | 맞춤 도서 추천 |
 | `review` | /api/review/create | ApiReviewCreateView | 독서 기록 등록 |
 |  | /api/review/list | ApiReviewListView | 독서 기록 리스트 |
 |  | /api/review/<<int:pk>> | ApiReviewDetailView | 독서 기록 상세 정보 |
-|  | /api/review/update/<<int:pk>> | ApiReviewUpdateView | 독서 기록 수정 |
-|  | /api/review/delete/<<int:pk>> | ApiReviewDeleteView | 독서 기록 삭제 |
+|  | /api/review/<<int:pk>>/update | ApiReviewUpdateView | 독서 기록 수정 |
+|  | /api/review/<<int:pk>>/delete | ApiReviewDeleteView | 독서 기록 삭제 |
 ### 6. 사용 기술
 >- Python 3.12
 >- Django 5.0.7
