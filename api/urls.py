@@ -20,6 +20,6 @@ urlpatterns = [
     # 리뷰
     path("review/create/", ApiReviewCreateView.as_view(), name = "create_review"),
     path("review/list/", ApiReviewListView.as_view(), name = "review_list"),
-    path("review/<int:pk>/", ApiReviewDetailView.as_view(), name = "review_list"),
-    path("review/delete/<int:pk>/", ApiReviewDeleteView.as_view(), name = "review_list"),
+    path("review/<int:pk>/", ApiReviewDetailView.as_view(), name = "detail_review"),
+    path("review/<int:pk>/delete/", ApiReviewDeleteView.as_view(), name = "delete_review"),
 ]

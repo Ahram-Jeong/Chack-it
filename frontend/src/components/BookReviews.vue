@@ -311,7 +311,7 @@ export default {
       const result = confirm("삭제 하시겠습니까?");
       if (result) {
         console.log("deleteReview() 호출");
-        axios.delete(`/api/review/delete/${rvId}/`)
+        axios.delete(`/api/review/${rvId}/delete/`)
             .then(res => {
               console.log("deleteReview() 성공", res);
               this.dialog4 = false;
