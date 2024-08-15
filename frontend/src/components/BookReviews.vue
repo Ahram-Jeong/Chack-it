@@ -4,7 +4,7 @@
     <div class="header-container">
       <div>
         <h2>내 서재</h2>
-        <h4>Review</h4>
+        <h4>Book Review</h4>
       </div>
       <button @click="dialog1 = true" class="btn btn-basic" type="button">글쓰기</button>
     </div>
