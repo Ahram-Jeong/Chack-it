@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, DetailView, CreateView
-from django.views.generic.edit import BaseCreateView, BaseDeleteView
+from django.views.generic.edit import BaseCreateView, BaseDeleteView, BaseUpdateView
 import json
 import random
 
@@ -226,6 +226,30 @@ class ApiReviewDetailView(UserPassesTestMixin, DetailView):
             "review_content": review.review_content,
         }
         return JsonResponse(data = data, safe = True)
+
+# 리뷰 수정
+class ApiReviewUpdateView(UserPassesTestMixin, BaseUpdateView):
+    model = Review
+    fields = ["review_rating", "review_content"]
+
+    def test_func(self):
+        review = self.get_object()  # 현재의 리뷰 객체 가져오기
+        return self.request.user.is_authenticated and review.user == self.request.user
+
+    def get_object(self):
+        return get_object_or_404(Review, pk = self.kwargs["pk"])
+
+    def post(self, request, *args, **kwargs):
+        review = self.get_object()
+        # Vue.js에서 JSON 형식으로 데이터를 보냈기 때문에 JSON 데이터 로드
+        data = json.loads(request.body)
+
+        review.review_rating = data.get("review_rating")
+        review.review_content = data.get("review_content")
+        # 객체 업데이트
+        review.save() # 변경 내용 DB 반영
+
+        return JsonResponse(data = {"review_rating": review.review_rating, "review_content": review.review_content}, safe = True, status = 200)
 
 # 리뷰 삭제
 class ApiReviewDeleteView(UserPassesTestMixin, BaseDeleteView):

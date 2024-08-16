@@ -48,7 +48,7 @@
       <v-card-subtitle>{{ selectedReview.author }}</v-card-subtitle>
       <v-card-subtitle>{{ selectedReview.publisher }}</v-card-subtitle>
       <!-- 독서 기록 폼 -->
-      <v-form id="review-form" ref="reviewForm">
+      <v-form id="review-update-form" ref="reviewUpdateForm">
         <v-rating v-model="selectedReview.review_rating" hover></v-rating>
         <v-container>
           <v-textarea label="Book Review" v-model="selectedReview.review_content"></v-textarea>
@@ -266,8 +266,7 @@ export default {
         this.rating = 0;
         this.review = "";
         this.bookId = "";
-        // this.fetchReviews();
-        window.location.href = "/";
+        this.fetchReviews();
       }).catch(err => {
         console.log("postReview() 실패", err);
         if (err.response.data.error == "EMPTY ERROR") {
@@ -297,13 +296,25 @@ export default {
             this.selectedReview = res.data;
             this.dialog4 = true;
           }).catch(err => {
-        console.log("detailReview() 실패", err);
-      });
+            console.log("detailReview() 실패", err);
+          });
     },
 
     // 리뷰 수정
-    updateReview() {
-
+    updateReview(rv) {
+      console.log("updateReview() 호출");
+      axios.put(`/api/review/${rv.id}/update/`, {
+        review_rating: rv.review_rating,
+        review_content: rv.review_content,
+      })
+          .then(res => {
+            console.log("updateReview() 성공", res);
+            alert("수정 완료!😊")
+            this.dialog4 = false;
+            this.fetchReviews();
+          }).catch(err => {
+            console.log("updateReview() 실패", err);
+          });
     },
 
     // 리뷰 삭제
@@ -318,10 +329,10 @@ export default {
               alert("삭제 되었습니다.");
               this.fetchReviews();
             }).catch(err => {
-          console.log("deleteReview() 실패", err);
+              console.log("deleteReview() 실패", err);
         });
       }
-    }
+    },
   }
 }
 </script>
