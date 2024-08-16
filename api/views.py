@@ -1,4 +1,5 @@
-from django.contrib.auth import login, get_user, logout
+from django.contrib.auth import login, get_user, logout, update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
@@ -6,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 from django.views.generic.edit import BaseCreateView, BaseDeleteView, BaseUpdateView
 import json
 import random
@@ -90,6 +91,52 @@ class ApiUserDetailView(CustomLoginRequiredMixin, View):
         }
         return JsonResponse(data = data, safe = True, status = 200)
 
+# 회원 정보 변경
+class ApiUserUpdateView(UserPassesTestMixin, FormView):
+    model = User
+    # 회원 정보 변경에 사용할 Form 클래스 지정
+    form_class = PasswordChangeForm
+
+    def test_func(self):
+        return self.request.user.is_authenticated and self.get_object() == self.request.user
+
+    def get_object(self):
+        return get_object_or_404(User, pk = self.kwargs["pk"])
+
+    def form_valid(self, form):
+        # 현재 사용자 가져오기
+        user = self.get_object()
+
+        # 비밀번호 변경
+        user.set_password(form.cleaned_data["new_password1"])
+        user.save() # 현재 객체 DB에 저장
+
+        # 로그인 세션 업데이트
+        update_session_auth_hash(self.request, user)
+
+        return JsonResponse(data = {}, status = 200, safe = True)
+
+    def form_invalid(self, form):
+        # form이 유효하지 않으면 form.errors 반환
+        return JsonResponse(data = {"errors": form.errors}, status = 400, safe = False)
+
+    def post(self, request, *args, **kwargs):
+        # JSON 데이터 로드
+        data = json.loads(request.body)
+
+        # PasswordChangeForm에 요청받은 데이터를 전달
+        form = self.form_class(user = self.get_object(), data = {
+            "old_password": data.get("old_password"),
+            "new_password1": data.get("new_password1"),
+            "new_password2": data.get("new_password2"),
+        })
+
+        # form 결과에 따른 분기 처리
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
 # 회원 탈퇴
 class ApiUserDeleteView(UserPassesTestMixin, BaseDeleteView):
     model = User
@@ -98,7 +145,7 @@ class ApiUserDeleteView(UserPassesTestMixin, BaseDeleteView):
         return self.request.user.is_authenticated and self.get_object() == self.request.user
 
     def get_object(self):
-        return get_object_or_404(User, pk=self.kwargs["pk"])
+        return get_object_or_404(User, pk = self.kwargs["pk"])
 
     def delete(self, request, *args, **kwargs):
         user = self.get_object()
@@ -308,7 +355,6 @@ class ApiRecommendView(UserPassesTestMixin, ListView):
     def get(self, request):
         # get_queryset() 으로 필터링된 리뷰 가져오기
         review_books = self.get_queryset()
-        print(review_books, len(review_books))
 
         # 필터링 결과가 없다면 빈 리스트 반환
         if not review_books.exists():
@@ -318,7 +364,6 @@ class ApiRecommendView(UserPassesTestMixin, ListView):
         select_one_book = random.choice(review_books)
         # 선택 된 책의 id 추출
         select_one_book_id = select_one_book["book__id"]
-        print(f"==============================================={select_one_book_id}")
 
         # 3. 모든 책의 "categoryName" 필드 추출
         books = list(Book.objects.all()) # QuerySet 결과를 리스트로 변환

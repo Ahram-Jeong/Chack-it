@@ -51,32 +51,35 @@
       <v-form id="user-update-form" ref="userUpdateForm">
         <!-- 현재 비밀번호 -->
         <v-text-field
-            name="current_password"
+            name="old_password"
             label="현재 비밀번호"
             type="password"
             clearable
-            v-model="currentPassword"
+            v-model="oldPassword"
+            :error-messages="errors.old_password"
         ></v-text-field>
 
         <!-- 새 비밀번호 -->
         <v-text-field
-            name="new_password"
+            name="new_password1"
             label="새 비밀번호"
             type="password"
             clearable
-            v-model="newPassword"
+            v-model="newPassword1"
+            :error-messages="errors.new_password1"
         ></v-text-field>
         <v-text-field
-            name="confirm_password"
+            name="new_password2"
             label="새 비밀번호 확인"
             type="password"
             clearable
-            v-model="confirmPassword"
+            v-model="newPassword2"
+            :error-messages="errors.new_password2"
         ></v-text-field>
         <br />
         <v-card-actions class="justify-center">
           <v-btn class="text-grey text-decoration-none" @click="dialog=false">취소</v-btn>
-          <v-btn class="text-white bg-black" @click="updateUser()">수정</v-btn>
+          <v-btn class="text-white bg-black" @click="updateUser(user.id)">수정</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -94,9 +97,11 @@ export default {
     // 회원 정보
     user: {},
     // 비밀번호 변경
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    oldPassword: "",
+    newPassword1: "",
+    newPassword2: "",
+    // 정보 수정 오류 시 메시지 저장 객체
+    errors: {}
   }),
 
   methods: {
@@ -143,8 +148,24 @@ export default {
     },
 
     // 정보 수정
-    updateUser() {
-
+    updateUser(userId) {
+      console.log("updateUser() 호출");
+      axios.put(`/api/account/${userId}/update/`, {
+        old_password: this.oldPassword,
+        new_password1: this.newPassword1,
+        new_password2: this.newPassword2,
+      }).then(res => {
+        console.log("updateUser() 성공", res);
+        alert("비밀번호 변경 완료");
+        this.dialog = false;
+        this.oldPassword = "";
+        this.newPassword1 = "";
+        this.newPassword2 = "";
+        this.errors = {};
+      }).catch(err => {
+        console.log("updateUser() 실패", err);
+        this.errors = err.response.data.errors;
+      });
     },
   }
 }
