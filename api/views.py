@@ -59,7 +59,6 @@ class ApiLogoutView(LogoutView):
         logout(request)
         return JsonResponse(data = {}, safe = True, status = 200)
 
-
 # 회원 가입
 class ApiRegisterView(BaseCreateView):
     form_class = CustomUserCreationForm
@@ -79,6 +78,17 @@ class ApiRegisterView(BaseCreateView):
             field : error.get_json_data() for (field, error) in form.errors.items()
         }
         return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)
+
+# 회원 정보
+class ApiUserDetailView(CustomLoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = get_user(request)
+        data = {
+            "id" : user.id,
+            "username" : user.username,
+            "email" : user.email,
+        }
+        return JsonResponse(data = data, safe = True, status = 200)
 
 # 회원 탈퇴
 class ApiUserDeleteView(UserPassesTestMixin, BaseDeleteView):

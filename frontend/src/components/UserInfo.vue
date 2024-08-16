@@ -10,7 +10,7 @@
         <v-list>
           <v-list-item>
             <v-list-item-title>
-              <v-btn elevation="0">정보 수정</v-btn>
+              <v-btn @click="getUser()" elevation="0">정보 수정</v-btn>
             </v-list-item-title>
             <v-list-item-title>
               <v-btn @click="deleteUser()" elevation="0">계정 삭제</v-btn>
@@ -24,6 +24,63 @@
       </v-btn>
     </p>
   </div>
+
+  <!-- 회원 정보 수정 -->
+  <v-dialog v-model="dialog" max-width="500">
+    <v-card class="text-center pa-4">
+      <div style="margin-bottom: 10px">
+        <h3>비밀번호 변경</h3>
+      </div>
+      <v-text-field
+          name="username"
+          class="mb-2"
+          style="pointer-events: none;"
+          label="아이디"
+          readonly
+          :model-value="user.username"
+      ></v-text-field>
+
+      <v-text-field
+          name="email"
+          label="이메일"
+          type="email"
+          style="pointer-events: none;"
+          readonly
+          :model-value="user.email"
+      ></v-text-field>
+      <v-form id="user-update-form" ref="userUpdateForm">
+        <!-- 현재 비밀번호 -->
+        <v-text-field
+            name="current_password"
+            label="현재 비밀번호"
+            type="password"
+            clearable
+            v-model="currentPassword"
+        ></v-text-field>
+
+        <!-- 새 비밀번호 -->
+        <v-text-field
+            name="new_password"
+            label="새 비밀번호"
+            type="password"
+            clearable
+            v-model="newPassword"
+        ></v-text-field>
+        <v-text-field
+            name="confirm_password"
+            label="새 비밀번호 확인"
+            type="password"
+            clearable
+            v-model="confirmPassword"
+        ></v-text-field>
+        <br />
+        <v-card-actions class="justify-center">
+          <v-btn class="text-grey text-decoration-none" @click="dialog=false">취소</v-btn>
+          <v-btn class="text-white bg-black" @click="updateUser()">수정</v-btn>
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -33,6 +90,13 @@ export default {
   data: () => ({
     username: document.getElementById("username").value,
     userId: document.getElementById("user-id").value,
+    dialog: false,
+    // 회원 정보
+    user: {},
+    // 비밀번호 변경
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   }),
 
   methods: {
@@ -63,6 +127,24 @@ export default {
           console.log("deleteUser() 실패", err);
         });
       }
+    },
+
+    // 계정 정보
+    getUser() {
+      this.dialog = true;
+      console.log("getUser() 호출");
+      axios.get(`/api/account/${this.userId}/`)
+          .then(res => {
+            console.log("getUser() 성공", res);
+            this.user = res.data;
+          }).catch(err => {
+        console.log("getUser() 실패", err);
+      });
+    },
+
+    // 정보 수정
+    updateUser() {
+
     },
   }
 }

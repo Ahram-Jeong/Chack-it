@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <!-- 로그인 -->
     <v-card class="mx-auto px-5 py-10 mt-10" max-width="500">
       <h1 class="display-1 my-5" align="center">Chackit</h1>
       <v-form v-model="form" @submit.prevent="onSubmit" id = "login-form">
@@ -52,7 +53,7 @@
   </v-container>
 
   <!-- ----------------------------------------------------------------------------------------------------------- -->
-  <!-- 회원가입 dialog -->
+  <!-- 회원가입 -->
   <v-dialog v-model="dialog" max-width="500">
     <v-card class="text-center pa-4">
       <h1 class="display-1 my-5" align="center">Join Us</h1>

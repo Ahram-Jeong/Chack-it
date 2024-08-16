@@ -10,6 +10,7 @@ urlpatterns = [
     path("logout/", ApiLogoutView.as_view(), name = "logout"),
     path("me/", ApiMeView.as_view(), name = "me"),
     path("account/create/", ApiRegisterView.as_view(), name = "register"),
+    path("account/<int:pk>/", ApiUserDetailView.as_view(), name = "detail_user"),
     path("account/<int:pk>/delete/", ApiUserDeleteView.as_view(), name = "delete_user"),
 
     # 도서
