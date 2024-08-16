@@ -60,7 +60,7 @@ class ApiLogoutView(LogoutView):
         return JsonResponse(data = {}, safe = True, status = 200)
 
 
-# 회원가입
+# 회원 가입
 class ApiRegisterView(BaseCreateView):
     form_class = CustomUserCreationForm
 
@@ -79,6 +79,22 @@ class ApiRegisterView(BaseCreateView):
             field : error.get_json_data() for (field, error) in form.errors.items()
         }
         return JsonResponse(data ={"errors" : errors}, safe = True, status = 400)
+
+# 회원 탈퇴
+class ApiUserDeleteView(UserPassesTestMixin, BaseDeleteView):
+    model = User
+
+    def test_func(self):
+        return self.request.user.is_authenticated and self.get_object() == self.request.user
+
+    def get_object(self):
+        return get_object_or_404(User, pk=self.kwargs["pk"])
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete() # 해당 유저 객체 삭제
+        logout(request) # 로그아웃
+        return JsonResponse(data={}, safe=True, status=204)
 
 # 도서 검색
 class ApiSearchListView(CustomLoginRequiredMixin, ListView):

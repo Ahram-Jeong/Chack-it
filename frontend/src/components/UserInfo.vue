@@ -9,8 +9,12 @@
         </template>
         <v-list>
           <v-list-item>
-            <v-list-item-title>정보 수정</v-list-item-title>
-            <v-list-item-title>계정 삭제</v-list-item-title>
+            <v-list-item-title>
+              <v-btn elevation="0">정보 수정</v-btn>
+            </v-list-item-title>
+            <v-list-item-title>
+              <v-btn @click="deleteUser()" elevation="0">계정 삭제</v-btn>
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -28,9 +32,11 @@ import axios from "axios";
 export default {
   data: () => ({
     username: document.getElementById("username").value,
+    userId: document.getElementById("user-id").value,
   }),
 
   methods: {
+    // 로그아웃
     logout() {
       console.log("logout() 호출");
       axios.get("/api/logout/")
@@ -42,7 +48,22 @@ export default {
           .catch(err => {
             console.log("logout() 실패", err);
           });
-    }
+    },
+
+    // 계정 삭제
+    deleteUser() {
+      if (confirm("계정을 삭제하시겠습니까?")) {
+        console.log("deleteUser() 호출");
+        axios.delete(`/api/account/${this.userId}/delete/`)
+            .then(res => {
+              console.log("deleteUser() 성공", res);
+              alert("삭제 되었습니다.");
+              window.location.href = "/";
+            }).catch(err => {
+          console.log("deleteUser() 실패", err);
+        });
+      }
+    },
   }
 }
 </script>
