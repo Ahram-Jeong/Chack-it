@@ -266,7 +266,8 @@ export default {
         this.rating = 0;
         this.review = "";
         this.bookId = "";
-        this.fetchReviews();
+        this.fetchReviews(); // 리뷰 목록 갱신
+        this.$emit("complete"); // 상위 컴포넌트(App.vue)에 complete 이벤트 전송
       }).catch(err => {
         console.log("postReview() 실패", err);
         if (err.response.data.error == "EMPTY ERROR") {
@@ -311,7 +312,8 @@ export default {
             console.log("updateReview() 성공", res);
             alert("수정 완료!😊")
             this.dialog4 = false;
-            this.fetchReviews();
+            this.fetchReviews(); // 리뷰 목록 갱신
+            this.$emit("complete"); // 상위 컴포넌트(App.vue)에 complete 이벤트 전송
           }).catch(err => {
             console.log("updateReview() 실패", err);
           });
@@ -327,7 +329,8 @@ export default {
               console.log("deleteReview() 성공", res);
               this.dialog4 = false;
               alert("삭제 되었습니다.");
-              this.fetchReviews();
+              this.fetchReviews(); // 리뷰 목록 갱신
+              this.$emit("complete"); // 상위 컴포넌트(App.vue)에 complete 이벤트 전송
             }).catch(err => {
               console.log("deleteReview() 실패", err);
         });

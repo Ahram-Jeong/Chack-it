@@ -6,9 +6,9 @@
 
     <v-main>
       <!-- contents -->
-      <UserInfo v-if="me.username != null" />
-      <BookRecommendation v-if="me.username != null" />
-      <BookReviews v-if="me.username != null" />
+      <UserInfo v-if="me.username != null"/>
+      <BookRecommendation v-if="me.username != null" ref="bookRefresh"/>
+      <BookReviews v-if="me.username != null" @complete="complete"/>
       <AccountForm v-else />
     </v-main>
 
@@ -63,6 +63,14 @@ export default {
             alert(err.response.status + " : " + err.response.statusText);
           });
     },
+
+    // BookRecommendation 컴포넌트의 refresh() 호출
+    complete() {
+      if (this.$refs.bookRefresh) {
+        this.$refs.bookRefresh.refresh();
+      }
+    },
+
   },
 }
 </script>
