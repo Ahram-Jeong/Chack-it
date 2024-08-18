@@ -3,7 +3,8 @@
   <img src="https://github.com/user-attachments/assets/d96471cb-15a0-4921-8b06-13131258447a">
 </p>
 
-- [💡 Chackit 프로젝트 기획서](https://ahram-jeong.notion.site/Chack-it-138ef17d41af4200b659c7520a56dc3d?pvs=4)</br>
+- [💡 Chackit 프로젝트 기획서](https://ahram-jeong.notion.site/Chack-it-138ef17d41af4200b659c7520a56dc3d?pvs=4)
+- [🎬 시연 영상 바로 가기](https://drive.google.com/drive/folders/1uzXM1teH9BnI2h6pPyX60wFywYQvjEv3?usp=sharing)
 ### 1. 개요
 ✔ **Python-Django**와 Vue.js, 머신러닝을 구현한 독서 기록 및 도서 추천 SPA 개인 프로젝트
 ### 2. 수행 기간
